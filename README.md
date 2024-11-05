@@ -17,12 +17,22 @@
  3. ``dotnet build``
 
  ## Installation
- 1. Copy all plugin files to ``addons/counterstrikesharp/plugins/`` folder.
- 2. Configure all plugin json files in ``addons/counterstrikesharp/configs/`` folder. (If not exists, the server will generate automatically on startup.)
+ 1. Drag files in zip to ``game/csgo`` folder.
+ 2. Configure all json file in ``game/csgo/addons/counterstrikesharp/configs/CS2GamingAPICore`` folder. (If not exists, the server will generate automatically on startup.)
  3. Enjoy :D
 
+ ## Configure
+ ```jsonc
+{
+  "Token": "", // 32 lenght token provided by CS2Gaming
+  "ProjectUrl": "https://************.com/", // Your URL
+  "ProjectUrlType": "steamgroup", // set to "steamgroup", "vk", "website", "telegram" any other than these will not work
+  "RequestUrl": "https://************.com/*******", // request URL
+  "ConfigVersion": 1 // no need to do anything.
+}
+ ```
+
  ## Plugin API Usage
- I have made Example Plugin, But I show on ReadMe anyway.
  ```cs
  using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
