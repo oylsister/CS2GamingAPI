@@ -1,0 +1,71 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+
+    # Get version from .cs file
+    - name: Get Version
+      run: |
+        version=$(grep 'public override string ModuleVersion =>' /home/runner/work/CS2GamingAPI/CS2GamingAPI/CS2GamingAPICore/Plugin.cs | sed 's/.*=> "\(.*\)";/\1/')
+        version_under=${version// /_}
+        version_minus=${version// /-}
+        short_sha=$(echo $GITHUB_SHA | cut -c1-7)
+        tag=$(echo $version_minus | tr '[:upper:]' '[:lower:]')
+        file_ver=$(echo $version_under | tr '[:upper:]' '[:lower:]')
+        echo "VERSION=$version" >> $GITHUB_ENV
+        echo "VERSION_UNDER=$version_under" >> $GITHUB_ENV
+        echo "VERSION_MINUS=$version_minus" >> $GITHUB_ENV
+        echo "SHORT_SHA=$short_sha" >> $GITHUB_ENV
+        echo "TAG=$tag" >> $GITHUB_ENV
+        echo "FILE_VER=$file_ver" >> $GITHUB_ENV
+    
+    # gather all file in for release
+    - name: Prepare Directory
+      run: | 
+        # make main folder
+        mkdir -p release/addons/counterstrikesharp/plugins/CS2GamingAPICore
+
+        # Copy all plugins files
+        cp /home/runner/work/CS2GamingAPI/CS2GamingAPI/CS2GamingAPICore/bin/Debug/net8.0/CS2GamingAPICore.dll release/addons/counterstrikesharp/plugins/CS2GamingAPICore/
+        cp /home/runner/work/CS2GamingAPI/CS2GamingAPI/CS2GamingAPICore/bin/Debug/net8.0/CS2GamingAPICore.pdb release/addons/counterstrikesharp/plugins/CS2GamingAPICore/
+        cp /home/runner/work/CS2GamingAPI/CS2GamingAPI/CS2GamingAPICore/bin/Debug/net8.0/Microsoft.Extensions.Http.dll release/addons/counterstrikesharp/plugins/CS2GamingAPICore/
+        cp /home/runner/work/CS2GamingAPI/CS2GamingAPI/CS2GamingAPICore/bin/Debug/net8.0/Newtonsoft.Json.dll release/addons/counterstrikesharp/plugins/CS2GamingAPICore/
+        cp -r /home/runner/work/CS2GamingAPI/CS2GamingAPI/build/addons/ release/
+
+    # artifact for user to getting a file.
+    - uses: actions/upload-artifact@v4
+      with:
+        name: CS2GamingAPI-${{ env.SHORT_SHA }}
+        path: release/
+
+    # zip file
+    - name: Zip File
+      run: |
+        cd release
+        zip -r "CS2GamingAPI${{ env.FILE_VER }}.zip" addons
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.TAG }}
+        name: ${{ env.VERSION }}
+        files: release/CS2GamingAPI_${{ env.FILE_VER }}.zip
