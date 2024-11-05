@@ -61,7 +61,7 @@ jobs:
     - name: Zip File
       run: |
         cd release
-        zip -r "CS2GamingAPI${{ env.FILE_VER }}.zip" addons
+        zip -r "CS2GamingAPI_${{ env.FILE_VER }}.zip" addons
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
