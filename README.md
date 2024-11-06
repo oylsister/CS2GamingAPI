@@ -1,6 +1,8 @@
 # CS2GamingAPI
  Plugin sending async POST request to web endpoint.
 
+ Token for CS2GamingAPI can be request from Artour.dev via [Discord](https://discord.com/users/795401139503235074): artourdev or Telegram: @artourdev
+ 
  ## Requirement
  - [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/)
  - [Shop-Core](https://github.com/Ganter1234/Shop-Core) (For shop restriction module).
